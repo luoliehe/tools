@@ -26,7 +26,7 @@ public class Test {
 		List<Department> ds = Arrays.asList(d1,d2,d3,d4);
 		
 		//The first method 
-		List<AbsNode<Department>> rootNode1 = new TreeBuilder<Department>().warpAndBuilder(ds, DepartmentNode.class);
+		List<AbsNode<Department>> rootNode1 = new TreeBuilder<Department>().builder(ds, DepartmentNode.class);
 		
 		
 		//The second method 

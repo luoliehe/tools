@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * 树结构数据创建器<br>
- * 调用方法 {@link #warpAndBuilder(List, Class)} 可以进行一步到位的进行树的生成<br> 
+ * 调用方法 {@link #builder(List, Class)} 可以进行一步到位的进行树的生成<br> 
  * 包装节点需继承{@link AbsNode}
  * 
  * @param <E> 真正的节点对象
@@ -32,13 +32,14 @@ final public class TreeBuilder<E>{
 	 * @throws IllegalArgumentException
 	 * @throws InvocationTargetException
 	 */
-	public List<AbsNode<E>> warpAndBuilder(List<E> list,
+	public List<AbsNode<E>> builder(List<E> list,
 			Class<? extends AbsNode<E>> c) throws NoSuchMethodException,
 			SecurityException, InstantiationException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
 
 		List<AbsNode<E>> warpList = warp(list, c);
-		List<AbsNode<E>> root = new TreeBuilder<E>().builder(warpList);
+		
+		List<AbsNode<E>> root = builder(warpList);
 
 		return root;
 	}
