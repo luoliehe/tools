@@ -25,18 +25,21 @@ public class Test {
 		
 		List<Department> ds = Arrays.asList(d1,d2,d3,d4);
 		
+		TreeBuilder<Department> builder = new TreeBuilder<Department>();
+		
 		//The first method 
-		List<AbsNode<Department>> rootNode1 = new TreeBuilder<Department>().builder(ds, DepartmentNode.class);
-		
-		
-		//The second method 
-		List<DepartmentNode> nodes = TreeBuilder.warp(ds, DepartmentNode.class);
-		List<AbsNode<Department>> rootNode2 = new TreeBuilder<Department>().builder(nodes);
-		
-		
+		List<AbsNode<Department>> rootNode1 = builder.builder(ds, DepartmentNode.class);
 		System.out.println(new Gson().toJson(rootNode1));
 		
+		//The second method 
+		List<AbsNode<Department>> rootNode2 = builder.builder(TreeBuilder.warp(ds, DepartmentNode.class));
 		System.out.println(new Gson().toJson(rootNode2));
+		
+		//The method get one node
+		System.out.println(builder.getNode(4));
+		
+		//The method get all parent and include self
+		System.out.println(builder.getSeriesParents(4));
 		 
 	}
 	

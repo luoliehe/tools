@@ -18,7 +18,11 @@ import java.util.Map;
  */
 final public class TreeBuilder<E>{
 	
+	private static Object LOCK = new Object();
+	
 	private Map<Integer, AbsNode<E>> map;
+	
+	private Map<Integer, List<AbsNode<E>>> seriesParentMap;
 	
 	/***
 	 * 包装数据成节点对象，并且构建树结构数据，返回根节点数组
@@ -52,7 +56,15 @@ final public class TreeBuilder<E>{
 	 */
 	public List<AbsNode<E>> builder(List<? extends AbsNode<E>> list){
 		
-		map = new HashMap<Integer, AbsNode<E>>();
+		if(map == null){
+			synchronized (LOCK) {
+				if(map == null){
+					map = new HashMap<Integer, AbsNode<E>>();
+				}
+			}
+		}
+		
+		reset();
 
 		for (AbsNode<E> node : list) {
 			map.put(node.getSelfId(), node);
@@ -62,10 +74,8 @@ final public class TreeBuilder<E>{
 		
 		//组织树结构关系
 		for (Map.Entry<Integer, AbsNode<E>> entry : map.entrySet()) {
-			
 			AbsNode<E> node = entry.getValue();
 			AbsNode<E> parent = map.get(node.getParentId());
-			
 			if (parent == null) {
 				roots.add(node);
 			} else {
@@ -75,6 +85,48 @@ final public class TreeBuilder<E>{
 		
 		return roots;
 	}
+	
+	private void reset() {
+		if (map != null) {
+			map.clear();
+		}
+		if (seriesParentMap != null) {
+			seriesParentMap.clear();
+		}
+	}
+
+	public List<AbsNode<E>> getSeriesParents(Integer id){
+		
+		if (seriesParentMap == null) {
+			synchronized (LOCK) {
+				if (seriesParentMap == null) {
+					seriesParentMap = new HashMap<Integer, List<AbsNode<E>>>();
+				}
+			}
+		}
+		
+		List<AbsNode<E>>  list = seriesParentMap.get(id);
+
+		if(list == null){
+			
+			AbsNode<E> node = getNode(id);
+
+			if (node != null) {
+				
+				list = new ArrayList<AbsNode<E>>();
+				list.add(node);
+				
+				while ((node = getNode(node.getParentId())) != null) {
+					list.add(node);
+				}
+				
+				seriesParentMap.put(id, list);
+			}
+		}
+
+		return list;
+	}
+	
 	
 	/**
 	 * 获得一个节点
@@ -104,22 +156,16 @@ final public class TreeBuilder<E>{
 			IllegalArgumentException, InvocationTargetException {
 
 		List<N> warpList = null;
-		
 		if (list != null) {
-			
 			warpList = new ArrayList<N>();
-
 			for (E e : list) {
-				
 				Constructor<?> constructor = c.getConstructor(e.getClass());
-
 				@SuppressWarnings("unchecked")
 				N obj = (N) constructor.newInstance(e);
-				
 				warpList.add(obj);
-			}	
+			}
 		}
-		
+
 		return warpList;
 	}
 	
