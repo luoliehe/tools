@@ -9,7 +9,7 @@ import com.llh.utils.tree.TreeBuilder;
 import com.llh.utils.tree.TreeBuilder.AbsNode;
 
 /**
- * TreeBuilder test class
+ * Test test class
  * 
  * @author luolh
  *

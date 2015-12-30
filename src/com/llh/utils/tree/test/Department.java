@@ -1,5 +1,10 @@
 package com.llh.utils.tree.test;
 
+
+/**
+ * 部门实体
+ * @author luolh
+ */
 public class Department {
 		
 		private Integer id;
