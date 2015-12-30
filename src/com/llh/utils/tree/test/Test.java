@@ -14,8 +14,7 @@ import com.llh.utils.tree.TreeBuilder.AbsNode;
  * @author luolh
  *
  */
-public class TreBuilderTest {
-	
+public class Test {
 	
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
@@ -23,6 +22,7 @@ public class TreBuilderTest {
 		Department d2 = new Department(2,1, "开发部");
 		Department d3 = new Department(3,1, "运维部");
 		Department d4 = new Department(4,2, "测试组");
+		
 		List<Department> ds = Arrays.asList(d1,d2,d3,d4);
 		
 		//The first method 
@@ -39,4 +39,5 @@ public class TreBuilderTest {
 		System.out.println(new Gson().toJson(rootNode2));
 		 
 	}
+	
 }
