@@ -55,10 +55,9 @@ final public class TreeBuilder<E>{
 	 * @return
 	 */
 	public List<AbsNode<E>> builder(List<? extends AbsNode<E>> list){
-		
-		if(map == null){
+		if (map == null) {
 			synchronized (LOCK) {
-				if(map == null){
+				if (map == null) {
 					map = new HashMap<Integer, AbsNode<E>>();
 				}
 			}
@@ -67,15 +66,15 @@ final public class TreeBuilder<E>{
 		reset();
 
 		for (AbsNode<E> node : list) {
-			map.put(node.getSelfId(), node);
+			map.put(node.getSelfId(node.getObj()), node);
 		}
 		 
 		List<AbsNode<E>> roots = new ArrayList<AbsNode<E>>();
 		
-		//组织树结构关系
+		// 组织树结构关系
 		for (Map.Entry<Integer, AbsNode<E>> entry : map.entrySet()) {
 			AbsNode<E> node = entry.getValue();
-			AbsNode<E> parent = map.get(node.getParentId());
+			AbsNode<E> parent = map.get(node.getParentId(node.getObj()));
 			if (parent == null) {
 				roots.add(node);
 			} else {
@@ -96,7 +95,6 @@ final public class TreeBuilder<E>{
 	}
 
 	public List<AbsNode<E>> getSeriesParents(Integer id){
-		
 		if (seriesParentMap == null) {
 			synchronized (LOCK) {
 				if (seriesParentMap == null) {
@@ -106,17 +104,14 @@ final public class TreeBuilder<E>{
 		}
 		
 		List<AbsNode<E>>  list = seriesParentMap.get(id);
-
+		
 		if(list == null){
-			
 			AbsNode<E> node = getNode(id);
-
 			if (node != null) {
-				
 				list = new ArrayList<AbsNode<E>>();
 				list.add(node);
 				
-				while ((node = getNode(node.getParentId())) != null) {
+				while ((node = getNode(node.getParentId(node.getObj()))) != null) {
 					list.add(node);
 				}
 				
@@ -141,7 +136,7 @@ final public class TreeBuilder<E>{
 	 * 将原始对象包装成节点对象,节点对象需要覆盖 {@link AbsNode} 的构造方法 
 	 * 
 	 * @param list 需要包装的原始数据
-	 * @param c 包装成的目标对象, 目标类型的为 {@link AbsNode}的子类
+	 * @param warpClass 包装成的目标对象, 目标类型的为 {@link AbsNode}的子类
 	 * @return 返回包装成 warpClass 类型的数组
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
@@ -151,18 +146,24 @@ final public class TreeBuilder<E>{
 	 * @throws InvocationTargetException
 	 */
 	public static <E, N extends AbsNode<E>> List<N> warp(List<E> list,
-			Class<? extends AbsNode<E>> c) throws NoSuchMethodException,
+			Class<? extends AbsNode<E>> warpClass) throws NoSuchMethodException,
 			SecurityException, InstantiationException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
 
 		List<N> warpList = null;
+		
 		if (list != null) {
 			warpList = new ArrayList<N>();
-			for (E e : list) {
-				Constructor<?> constructor = c.getConstructor(e.getClass());
+			
+			for (E obj : list) {
+				//获得包装node的构造函数
+				Constructor<?> constructor = warpClass.getConstructor(obj.getClass());
+				
+				//实例化AbsNode节点对象
 				@SuppressWarnings("unchecked")
-				N obj = (N) constructor.newInstance(e);
-				warpList.add(obj);
+				N instance = (N) constructor.newInstance(obj);
+				
+				warpList.add(instance);
 			}
 		}
 
@@ -177,25 +178,24 @@ final public class TreeBuilder<E>{
 	 * @param <E> 节点中包装的 真正的用户节点对象
 	 */
 	public static abstract class AbsNode<E> {
-
 		private E obj;
 		private List<AbsNode<E>> childs;
 
-		public AbsNode(E t) {
-			this.obj = t;
+		public AbsNode(E obj) {
+			this.obj = obj;
 		}
 		
 		/**
-		 * 获得自身的ID
+		 * 需实现方法，告知自身的ID
 		 * @return
 		 */
-		public abstract Integer getSelfId();
+		public abstract Integer getSelfId(E obj);
 
 		/**
-		 * 获得父级的ID
+		 * 需实现方法，告知父节点的ID
 		 * @return
 		 */
-		public abstract Integer getParentId();
+		public abstract Integer getParentId(E obj);
 		
 		/**
 		 * 获得原始对象
@@ -215,5 +215,7 @@ final public class TreeBuilder<E>{
 		public List<AbsNode<E>> getChildren(){
 			return childs;
 		}
+
 	}
+	
 }

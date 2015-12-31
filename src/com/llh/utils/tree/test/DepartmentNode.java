@@ -9,20 +9,35 @@ import com.llh.utils.tree.TreeBuilder.AbsNode;
  */
 public class DepartmentNode extends AbsNode<Department> {
 
-	// TODO more user define field
-
+	// TODO more user define field	
+	private String name;
+	private Integer id;
+	
 	public DepartmentNode(Department t) {
 		super(t);
+		this.name = "NMME_"+t.getId();
+		this.id = t.getId();
 	}
 
 	@Override
-	public Integer getSelfId() {
-		return getObj().getId();
+	public Integer getSelfId(Department obj) {
+		return obj.getId();
 	}
 
 	@Override
-	public Integer getParentId() {
-		return getObj().getPid();
+	public Integer getParentId(Department obj) {
+		return obj.getPid();
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getId() {
+		return id;
+	}
 }

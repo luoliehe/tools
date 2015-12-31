@@ -18,7 +18,7 @@ public class Test {
 	
 	public static void main(String[] args) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
-		Department d1 = new Department(1,null, "公司");
+		Department d1 = new Department(1,-1, "公司");
 		Department d2 = new Department(2,1, "开发部");
 		Department d3 = new Department(3,1, "运维部");
 		Department d4 = new Department(4,2, "测试组");
@@ -36,11 +36,10 @@ public class Test {
 		System.out.println(new Gson().toJson(rootNode2));
 		
 		//The method get one node
-		System.out.println(builder.getNode(4));
+		System.out.println(new Gson().toJson(builder.getNode(4)));
 		
 		//The method get all parent and include self
-		System.out.println(builder.getSeriesParents(4));
-		 
+		System.out.println(new Gson().toJson(builder.getSeriesParents(4)));
 	}
 	
 }
