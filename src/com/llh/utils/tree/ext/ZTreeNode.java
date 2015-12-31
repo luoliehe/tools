@@ -4,7 +4,7 @@ import com.llh.utils.tree.TreeBuilder.AbsNode;
 
 /**
  * 
- * Ztree 前端需要的数据格式
+ * Ztree 前端需要的数据格式支持
  * 
  * @author luolh
  * @param <E>
