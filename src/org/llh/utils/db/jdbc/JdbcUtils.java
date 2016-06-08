@@ -52,6 +52,15 @@ public class JdbcUtils {
 		}
 	}
 	
+	/**
+	 * 获得{@link ResultSet}指定类型
+	 * @param rs
+	 * @param index
+	 * @param requiredType 类型
+	 * @return 返回指定的类型值，可能为   null
+	 * @throws SQLException 
+	 * @throws UnsupportedOperationException 当类型不支持抛出此异常
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getResultSetValue(ResultSet rs, int index, Class<T> requiredType) throws SQLException {
 		
@@ -122,4 +131,40 @@ public class JdbcUtils {
 		return value == null ? null : (T)value;
 	}
 	
+	/**
+	 * 将带下划线的命名转换为驼峰命名。
+	 * <br>
+	 * 如：
+	 * <br> user_name 转换为驼峰命名  userName
+	 * @param name
+	 * @return
+	 */
+	public static String convertUnderscoreNameToPropertyName(String name) {
+		StringBuilder result = new StringBuilder();
+		boolean nextIsUpper = false;
+		if (name != null && name.length() > 0) {
+			if (name.length() > 1 && name.substring(1,2).equals("_")) {
+				result.append(name.substring(0, 1).toUpperCase());
+			}
+			else {
+				result.append(name.substring(0, 1).toLowerCase());
+			}
+			for (int i = 1; i < name.length(); i++) {
+				String s = name.substring(i, i + 1);
+				if (s.equals("_")) {
+					nextIsUpper = true;
+				}
+				else {
+					if (nextIsUpper) {
+						result.append(s.toUpperCase());
+						nextIsUpper = false;
+					}
+					else {
+						result.append(s.toLowerCase());
+					}
+				}
+			}
+		}
+		return result.toString();
+	}
 }
