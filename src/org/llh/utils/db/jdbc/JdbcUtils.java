@@ -5,8 +5,11 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JdbcUtils {
 	
@@ -52,17 +55,90 @@ public class JdbcUtils {
 		}
 	}
 	
+	public static void close(Connection con, Statement stmt, ResultSet res){
+		closeConnection(con);
+		closeStatement(stmt);
+		closeResultSet(res);
+	}
+	
+	/**
+	 * 获得数据的列数
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int getRowColumnCount(ResultSet rs) throws SQLException{
+		if(rs == null) {
+			throw new RuntimeException("ResultSet must not be null");
+		}
+		ResultSetMetaData md = rs.getMetaData();
+		return md.getColumnCount();
+	}
+	
+	public static List<String> getColumnName(ResultSetMetaData rmd)
+			throws SQLException{
+		if (rmd == null) {
+			throw new RuntimeException("ResultSetMetaData must not be null!");
+		}
+		List<String> names = new ArrayList<>();
+		for (int c = 0, len = rmd.getColumnCount(); c < len; c++) {
+			names.add(getColumnName(rmd, c + 1));
+		}
+		return names;
+	}
+	
+	/**
+	 * 获得指定列的名称
+	 * @param rmd
+	 * @param index 第一列是1, 第二列是2, ...
+	 * @return column name
+	 * @throws SQLException
+	 */
+	public static String getColumnName(ResultSetMetaData rmd, int index) 
+			throws SQLException {
+		if (rmd == null) {
+			throw new RuntimeException("ResultSetMetaData must not be null!");
+		}
+		if(index < 1){
+			throw new RuntimeException("index must be equal or greater than!");
+		}
+		return rmd.getColumnName(index);
+	}
+	
+	/**
+	 * 
+	 * @param rs ResultSet 不能为空
+	 * @return 返回值一定不为 null
+	 * @throws SQLException
+	 */
+	public static List<String> getRowData(ResultSet rs) throws SQLException{
+		if(rs == null) {
+			throw new RuntimeException("ResultSet must not be null");
+		}
+		List<String> list = new ArrayList<>();
+		int cc = getRowColumnCount(rs);
+		for (int i = 0; i < cc; i++) {
+			Object obj = rs.getObject(i + 1);
+			if(obj == null){
+				continue;
+			}
+			list.add(rs.wasNull() ? null : String.valueOf(obj));
+		}
+		return list;
+	}
+	
 	/**
 	 * 获得{@link ResultSet}指定类型
 	 * @param rs
-	 * @param index
+	 * @param index 第一列是1, 第二列是2, ...
 	 * @param requiredType 类型
 	 * @return 返回指定的类型值，可能为   null
 	 * @throws SQLException 
 	 * @throws UnsupportedOperationException 当类型不支持抛出此异常
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getResultSetValue(ResultSet rs, int index, Class<T> requiredType) throws SQLException {
+	public static <T> T getResultSetValue(ResultSet rs, int index, Class<T> requiredType)
+			throws SQLException {
 		
 		Object value = null;
 		boolean isCheckNull = false;
