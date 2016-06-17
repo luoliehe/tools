@@ -11,6 +11,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * jdbc相关操作工具类
+ * @author victor.luo
+ */
 public class JdbcUtils {
 	
 	public static void closeConnection(Connection con) {
@@ -210,8 +214,7 @@ public class JdbcUtils {
 	/**
 	 * 将带下划线的命名转换为驼峰命名。
 	 * <br>
-	 * 如：
-	 * <br> user_name 转换为驼峰命名  userName
+	 * 如：user_name 转换为驼峰命名  userName
 	 * @param name
 	 * @return
 	 */
@@ -243,4 +246,5 @@ public class JdbcUtils {
 		}
 		return result.toString();
 	}
+	
 }
