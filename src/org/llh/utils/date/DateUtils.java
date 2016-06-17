@@ -110,7 +110,7 @@ public abstract class DateUtils {
 	}
 	
 	public static int getSecond(){
-		return getHours(getNowTime());
+		return getSecond(getNowTime());
 	}
 	
 	public static int getSecond(Date date){
@@ -120,7 +120,7 @@ public abstract class DateUtils {
 	}
 	
 	public static int getMinute(){
-		return getHours(getNowTime());
+		return getMinute(getNowTime());
 	}
 	
 	public static int getMinute(Date date){
@@ -157,6 +157,16 @@ public abstract class DateUtils {
 		return getMonth(getNowTime());
 	}
 	
+	public static int getDay(Date date){
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(Calendar.DATE);
+	}
+	
+	public static int getDay(){
+		return getDay(getNowTime());
+	}
+	
 	public static int getYear(Date date){
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
@@ -190,5 +200,13 @@ public abstract class DateUtils {
 		System.out.println(getNowTime());
 		System.out.println(getToday());
 		System.out.println(getYesterday());
+		System.out.println(getTomorrow());
+		System.out.println(getYesterday());
+		System.out.print(getYear());
+		System.out.print(getMonth());
+		System.out.print(getDay());
+		System.out.print(getHours());
+		System.out.print(getMinute());
+		System.out.print(getSecond());
 	}
 }
