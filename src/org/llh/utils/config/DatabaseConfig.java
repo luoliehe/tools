@@ -92,4 +92,13 @@ public class DatabaseConfig extends Config {
 	public void add(String key, String value) {
 		cacheMap.put(key, value);
 	}
+	
+	public static Mapper getDefaultMapper(final String columnKeyName, final String columnValueName){
+		return new Mapper(){
+			@Override
+			public Pair map(ResultSet rs) throws SQLException {
+				return new Pair(rs.getString(columnKeyName), rs.getString(columnValueName));
+			}
+		};
+	}
 }
