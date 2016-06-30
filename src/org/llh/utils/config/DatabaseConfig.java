@@ -13,6 +13,10 @@ import org.apache.commons.lang.StringUtils;
 import org.llh.utils.config.exception.ConfigException;
 import org.llh.utils.db.jdbc.JdbcUtils;
 
+/**
+ * 数据库表配置处理类
+ * @author victor
+ */
 public class DatabaseConfig extends Config {
 	
 	private String sql;
