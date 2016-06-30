@@ -87,8 +87,8 @@ public abstract class Config {
 		return get(String.class, key);
 	}
 
-	public String getString(String key, String def) {
-		return get(String.class, key, def);
+	public String getString(String key, String defaultValue) {
+		return get(String.class, key, defaultValue);
 	}
 
 	private <T> T get(Class<T> type, String key, T defaultValue) {
@@ -103,37 +103,24 @@ public abstract class Config {
 		if (v == null) {
 			return null;
 		}
-
-		T obj = null;
-
 		if (String.class == c) {
-			obj = (T) v;
-
-		} else if (Byte.class == c || Short.class == c || Integer.class == c 
+			return (T) v;
+		}
+		if (Byte.class == c || Short.class == c || Integer.class == c 
 				|| Long.class == c || Float.class == c
 				|| Double.class == c || Boolean.class == c) {
-
-			Constructor<T> constructor;
-
 			try {
-				constructor = c.getConstructor(String.class);
-				obj = constructor.newInstance(v);
-
-				return obj;
+				Constructor<T> constructor = c.getConstructor(String.class);
+				return constructor.newInstance(v);
 			} catch (Exception e) {
-				String err = String.format("请确保{%s}值为{%s}类型", key, c.getName());
-				throw new UnsupportedOperationException(err, e);
+				throw new UnsupportedOperationException(String.format("The value {%s} is not {%s} type.", key, c.getName()), e);
 			}
-		} else {
-			throw new UnsupportedOperationException("不支撑转换为类型:{%s}");
 		}
-
-		return obj;
+		throw new UnsupportedOperationException(String.format("Cannot be converted to [%s] type.", c.getName()));
 	}
 
 	/**
 	 * 通过key获得一个value
-	 * 
 	 * @param key
 	 * @return
 	 */

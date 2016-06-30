@@ -8,19 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.llh.utils.config.DatabaseConfig.Mapper.Pair;
+import org.llh.utils.db.jdbc.JdbcUtils;
 
 public class DatabaseConfig extends Config {
-
+	
 	private String sql;
 	private Mapper mapper;
-	private final Map<String, String> cacheMap;
+	private final Map<String, String> cacheMap = new HashMap<>();
 
 	public DatabaseConfig(String sql, Connection conn, Mapper mapper) {
 		this.sql = sql;
 		this.mapper = mapper;
-
-		cacheMap = new HashMap<>();
-
 		load(conn);
 	}
 
@@ -41,18 +39,7 @@ public class DatabaseConfig extends Config {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException e) {
-					}
-				}
-				if (pstm != null) {
-					try {
-						pstm.close();
-					} catch (SQLException e) {
-					}
-				}
+				JdbcUtils.close(conn, pstm, rs);
 			}
 
 		}
@@ -67,9 +54,8 @@ public class DatabaseConfig extends Config {
 		/**
 		 * 键值对类，对应 getX 方法的 key,value
 		 * @author victor
-		 *
 		 */
-		class Pair {
+		public class Pair {
 			private String key;
 			private String value;
 
@@ -98,7 +84,7 @@ public class DatabaseConfig extends Config {
 		Pair map(ResultSet rs) throws SQLException;
 	}
 
-	public void reload(Connection conn) {
+	public void sync(Connection conn) {
 		cacheMap.clear();
 		load(conn);
 	}
