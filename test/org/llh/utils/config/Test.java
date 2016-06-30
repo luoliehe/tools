@@ -4,10 +4,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.llh.utils.config.DatabaseConfig.Mapper;
+import org.llh.utils.config.DatabaseConfig.Pair;
+import org.llh.utils.config.exception.ConfigException;
 
 public class Test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ConfigException {
 		
 		Config config = new PropertiesConfig("test/com/llh/utils/config/test.properties");
 		System.out.println(config.getBoolean("b"));
