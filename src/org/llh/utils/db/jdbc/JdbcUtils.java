@@ -132,86 +132,6 @@ public class JdbcUtils {
 	}
 	
 	/**
-	 * 获得{@link ResultSet}指定类型
-	 * @param rs
-	 * @param index 第一列是1, 第二列是2, ...
-	 * @param requiredType 类型
-	 * @return 返回指定的类型值，可能为   null
-	 * @throws SQLException 
-	 * @throws UnsupportedOperationException 当类型不支持抛出此异常
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getResultSetValue(ResultSet rs, int index, Class<T> requiredType)
-			throws SQLException {
-		
-		Object value = null;
-		boolean isCheckNull = false;
-		
-		if (String.class.equals(requiredType)) {
-			value = rs.getString(index);
-		}
-		else if (boolean.class.equals(requiredType) || Boolean.class.equals(requiredType)) {
-			value = rs.getBoolean(index);
-			isCheckNull = true;
-		}
-		else if (byte.class.equals(requiredType) || Byte.class.equals(requiredType)) {
-			value = rs.getByte(index);
-			isCheckNull = true;
-		}
-		else if (short.class.equals(requiredType) || Short.class.equals(requiredType)) {
-			value = rs.getShort(index);
-			isCheckNull = true;
-		}
-		else if (int.class.equals(requiredType) || Integer.class.equals(requiredType)) {
-			value = rs.getInt(index);
-			isCheckNull = true;
-		}
-		else if (long.class.equals(requiredType) || Long.class.equals(requiredType)) {
-			value = rs.getLong(index);
-			isCheckNull = true;
-		}
-		else if (float.class.equals(requiredType) || Float.class.equals(requiredType)) {
-			value = rs.getFloat(index);
-			isCheckNull = true;
-		}
-		else if (double.class.equals(requiredType) || Double.class.equals(requiredType) ||
-				Number.class.equals(requiredType)) {
-			value = rs.getDouble(index);
-			isCheckNull = true;
-		}
-		else if (byte[].class.equals(requiredType)) {
-			value = rs.getBytes(index);
-		}
-		else if (java.sql.Date.class.equals(requiredType)) {
-			value = rs.getDate(index);
-		}
-		else if (java.sql.Time.class.equals(requiredType)) {
-			value = rs.getTime(index);
-		}
-		else if (java.sql.Timestamp.class.equals(requiredType) || java.util.Date.class.equals(requiredType)) {
-			value = rs.getTimestamp(index);
-		}
-		else if (BigDecimal.class.equals(requiredType)) {
-			value = rs.getBigDecimal(index);
-		}
-		else if (Blob.class.equals(requiredType)) {
-			value = rs.getBlob(index);
-		}
-		else if (Clob.class.equals(requiredType)) {
-			value = rs.getClob(index);
-		}
-		else {
-			String ex = String.format("unsupported the type %s", requiredType.getName());
-			throw new UnsupportedOperationException(ex);
-		}
-		
-		if (isCheckNull && value != null && rs.wasNull()) {
-			value = null;
-		}
-		return value == null ? null : (T)value;
-	}
-	
-	/**
 	 * 将带下划线的命名转换为驼峰命名。
 	 * <br>
 	 * 如：user_name 转换为驼峰命名  userName
@@ -247,4 +167,140 @@ public class JdbcUtils {
 		return result.toString();
 	}
 	
+	public static String lookupColumnName(ResultSetMetaData resultSetMetaData, int columnIndex) throws SQLException {
+		String name = resultSetMetaData.getColumnLabel(columnIndex);
+		if (name == null || name.length() < 1) {
+			name = resultSetMetaData.getColumnName(columnIndex);
+		}
+		return name;
+	}
+	
+	public static int lookupColumnIndex(ResultSetMetaData rmd, String name) throws SQLException{
+		for(int i=1; i <= rmd.getColumnCount(); i++){
+			if(name != null && name.equals(lookupColumnName(rmd, i))){
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	public static <T> T getResultSetValue(ResultSet rs, String columnName, Class<T> requiredType) throws SQLException {
+		return getResultSetValue(rs, lookupColumnIndex(rs.getMetaData(), columnName), requiredType);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T getResultSetValue(ResultSet rs, int index, Class<T> requiredType) throws SQLException {
+
+		if (requiredType == null) {
+			Object obj =  getResultSetValue(rs, index);
+			return obj == null ? null :(T)obj;
+		}
+
+		Object value = null;
+		boolean wasNullCheck = false;
+
+		// Explicitly extract typed value, as far as possible.
+		if (String.class.equals(requiredType)) {
+			value = rs.getString(index);
+		}
+		else if (boolean.class.equals(requiredType) || Boolean.class.equals(requiredType)) {
+			value = rs.getBoolean(index);
+			wasNullCheck = true;
+		}
+		else if (byte.class.equals(requiredType) || Byte.class.equals(requiredType)) {
+			value = rs.getByte(index);
+			wasNullCheck = true;
+		}
+		else if (short.class.equals(requiredType) || Short.class.equals(requiredType)) {
+			value = rs.getShort(index);
+			wasNullCheck = true;
+		}
+		else if (int.class.equals(requiredType) || Integer.class.equals(requiredType)) {
+			value = rs.getInt(index);
+			wasNullCheck = true;
+		}
+		else if (long.class.equals(requiredType) || Long.class.equals(requiredType)) {
+			value = rs.getLong(index);
+			wasNullCheck = true;
+		}
+		else if (float.class.equals(requiredType) || Float.class.equals(requiredType)) {
+			value = rs.getFloat(index);
+			wasNullCheck = true;
+		}
+		else if (double.class.equals(requiredType) || Double.class.equals(requiredType) ||
+				Number.class.equals(requiredType)) {
+			value = rs.getDouble(index);
+			wasNullCheck = true;
+		}
+		else if (byte[].class.equals(requiredType)) {
+			value = rs.getBytes(index);
+		}
+		else if (java.sql.Date.class.equals(requiredType)) {
+			value = rs.getDate(index);
+		}
+		else if (java.sql.Time.class.equals(requiredType)) {
+			value = rs.getTime(index);
+		}
+		else if (java.sql.Timestamp.class.equals(requiredType) || java.util.Date.class.equals(requiredType)) {
+			value = rs.getTimestamp(index);
+		}
+		else if (BigDecimal.class.equals(requiredType)) {
+			value = rs.getBigDecimal(index);
+		}
+		else if (Blob.class.equals(requiredType)) {
+			value = rs.getBlob(index);
+		}
+		else if (Clob.class.equals(requiredType)) {
+			value = rs.getClob(index);
+		}
+		else {
+			// Some unknown type desired -> rely on getObject.
+			value = getResultSetValue(rs, index);
+		}
+
+		// Perform was-null check if demanded (for results that the
+		// JDBC driver returns as primitives).
+		if (wasNullCheck && value != null && rs.wasNull()) {
+			value = null;
+		}
+		return value == null ? null : (T)value;
+	
+	}
+	
+	public static Object getResultSetValue(ResultSet rs, int index) throws SQLException {
+
+		Object obj = rs.getObject(index);
+		String className = null;
+		if (obj != null) {
+			className = obj.getClass().getName();
+		}
+		if (obj instanceof Blob) {
+			obj = rs.getBytes(index);
+		}
+		else if (obj instanceof Clob) {
+			obj = rs.getString(index);
+		}
+		else if (className != null &&
+				("oracle.sql.TIMESTAMP".equals(className) ||
+				"oracle.sql.TIMESTAMPTZ".equals(className))) {
+			obj = rs.getTimestamp(index);
+		}
+		else if (className != null && className.startsWith("oracle.sql.DATE")) {
+			String metaDataClassName = rs.getMetaData().getColumnClassName(index);
+			if ("java.sql.Timestamp".equals(metaDataClassName) ||
+					"oracle.sql.TIMESTAMP".equals(metaDataClassName)) {
+				obj = rs.getTimestamp(index);
+			}
+			else {
+				obj = rs.getDate(index);
+			}
+		}
+		else if (obj != null && obj instanceof java.sql.Date) {
+			if ("java.sql.Timestamp".equals(rs.getMetaData().getColumnClassName(index))) {
+				obj = rs.getTimestamp(index);
+			}
+		}
+		return obj;
+	
+	}
 }
